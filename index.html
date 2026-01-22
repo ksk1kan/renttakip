@@ -1,0 +1,2274 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="theme-color" content="#111827" />
+  <title>Rent A Car Gelir Takip</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <style>
+    :root{
+      --bg:#0b1020; --panel:#111827; --panel2:#0f172a; --text:#e5e7eb; --muted:#9ca3af;
+      --line:#243047; --accent:#22c55e; --danger:#ef4444; --warn:#f59e0b;
+      --btn:#1f2937; --btn2:#111827; --chip:#0b1225;
+      --radius:14px;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Sans", "Liberation Sans", sans-serif;
+    }
+    *{box-sizing:border-box}
+    body{margin:0; font-family:var(--sans); background:linear-gradient(180deg,#070a14 0%, #0b1020 100%); color:var(--text)}
+    a{color:inherit}
+    .app{display:flex; min-height:100vh}
+    header{
+      position:sticky; top:0; z-index:10;
+      background:rgba(17,24,39,.92); backdrop-filter: blur(8px);
+      border-bottom:1px solid var(--line);
+      padding:12px 14px;
+      display:flex; gap:10px; align-items:center; justify-content:space-between;
+    }
+    .brand{display:flex; gap:10px; align-items:center}
+    .logo{
+      width:34px; height:34px; border-radius:10px;
+      background:radial-gradient(circle at 30% 30%, #22c55e 0%, #16a34a 35%, #0b1020 100%);
+      box-shadow:0 10px 25px rgba(34,197,94,.18);
+      border:1px solid rgba(34,197,94,.25);
+    }
+    .title{font-weight:800; letter-spacing:.2px}
+    .subtitle{color:var(--muted); font-size:12px}
+    .top-actions{display:flex; gap:8px; flex-wrap:wrap; align-items:center}
+    .btn{
+      border:1px solid var(--line);
+      background:linear-gradient(180deg, rgba(31,41,55,.8), rgba(17,24,39,.9));
+      color:var(--text);
+      padding:9px 10px;
+      border-radius:12px;
+      cursor:pointer;
+      font-weight:700;
+      font-size:12px;
+      display:inline-flex; gap:8px; align-items:center;
+      user-select:none;
+    }
+    .btn:hover{filter:brightness(1.05)}
+    .btn:active{transform:translateY(1px)}
+    .btn.primary{border-color:rgba(34,197,94,.35); box-shadow:0 0 0 3px rgba(34,197,94,.12) inset}
+    .btn.danger{border-color:rgba(239,68,68,.35); box-shadow:0 0 0 3px rgba(239,68,68,.10) inset}
+    .btn.ghost{background:transparent}
+    .select, .input{
+      background:rgba(15,23,42,.75);
+      border:1px solid var(--line);
+      color:var(--text);
+      padding:9px 10px;
+      border-radius:12px;
+      outline:none;
+      font-size:13px;
+      width:100%;
+    }
+    .select{cursor:pointer}
+    .layout{display:flex; width:100%}
+    aside{
+      width:320px; min-width:280px;
+      border-right:1px solid var(--line);
+      background:rgba(17,24,39,.55);
+      padding:14px;
+    }
+    main{flex:1; padding:14px; min-width:0}
+    .card{
+      background:linear-gradient(180deg, rgba(17,24,39,.72), rgba(15,23,42,.72));
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      box-shadow:0 12px 30px rgba(0,0,0,.18);
+      padding:14px;
+      margin-bottom:14px;
+    }
+    .card.inner{
+      background:rgba(11,18,37,.60);
+      border:1px dashed rgba(36,48,71,.9);
+      box-shadow:none;
+      padding:12px;
+      margin:10px 0 0 0;
+    }
+    .row{display:flex; gap:10px; flex-wrap:wrap}
+    .row > *{flex:1; min-width:160px}
+    .row.tight > *{min-width:120px}
+    .h{
+      display:flex; justify-content:space-between; align-items:flex-end; gap:10px; margin-bottom:10px
+    }
+    .h h2{margin:0; font-size:16px}
+    .muted{color:var(--muted); font-size:12px}
+    .vehicles{display:flex; flex-direction:column; gap:8px; margin-top:10px}
+    .veh{
+      background:rgba(11,18,37,.7);
+      border:1px solid var(--line);
+      border-radius:14px;
+      padding:10px;
+      cursor:pointer;
+      display:flex; justify-content:space-between; gap:10px; align-items:center;
+    }
+    .veh:hover{filter:brightness(1.05)}
+    .veh.active{border-color:rgba(34,197,94,.45); box-shadow:0 0 0 3px rgba(34,197,94,.12) inset}
+    .plate{font-family:var(--mono); font-weight:900; letter-spacing:.4px}
+    .pill{
+      background:rgba(34,197,94,.10);
+      border:1px solid rgba(34,197,94,.25);
+      color:#b7f7c9;
+      padding:2px 8px;
+      border-radius:999px;
+      font-size:11px;
+      white-space:nowrap;
+    }
+    .table-wrap{overflow:auto; border-radius:14px; border:1px solid var(--line)}
+    table{width:100%; border-collapse:collapse; min-width:1100px; background:rgba(11,18,37,.55)}
+    th, td{border-bottom:1px solid rgba(36,48,71,.75); padding:10px; text-align:left; font-size:12px; vertical-align:top}
+    th{position:sticky; top:0; background:rgba(15,23,42,.95); z-index:1; font-size:11px; text-transform:uppercase; letter-spacing:.6px; color:#cbd5e1}
+    tr:hover td{background:rgba(34,197,94,.06)}
+    .right{text-align:right}
+    .dangerText{color:#fecaca}
+    .okText{color:#bbf7d0}
+    .chip{
+      display:inline-flex; gap:8px; align-items:center;
+      background:rgba(15,23,42,.7);
+      border:1px solid var(--line);
+      padding:6px 10px;
+      border-radius:999px;
+      font-size:12px;
+      white-space:nowrap;
+    }
+    .chip input[type="checkbox"]{accent-color:#22c55e; transform:scale(1.05)}
+    .grid2{display:grid; grid-template-columns:1fr 1fr; gap:14px}
+    @media (max-width: 980px){
+      aside{display:none}
+      .grid2{grid-template-columns:1fr}
+      table{min-width:980px}
+    }
+    .small{font-size:11px}
+    .kpi{display:flex; gap:10px; flex-wrap:wrap;}
+    .kpi .chip{background:rgba(11,18,37,.65)}
+    .divider{height:1px; background:var(--line); margin:12px 0}
+    .footnote{font-size:11px; color:var(--muted); line-height:1.45}
+    .tag{
+      display:inline-flex; align-items:center; gap:6px;
+      padding:2px 8px;
+      border-radius:999px;
+      border:1px solid rgba(36,48,71,.9);
+      background:rgba(11,18,37,.55);
+      color:#cbd5e1;
+      font-size:11px;
+      white-space:nowrap;
+      margin-left:8px;
+    }
+    
+    .tag.ok{border-color:rgba(34,197,94,.45); color:#bbf7d0}
+    .tag.warn{border-color:rgba(245,158,11,.55); color:#fde68a}
+    .tag.err{border-color:rgba(239,68,68,.55); color:#fecaca}
+
+/* Sidebar watermark (BAF logo) */
+    #globalCard { position: relative; overflow: hidden; }
+    #globalCard > * { position: relative; z-index: 1; }
+    #globalCard::before{
+      content:"";
+      position:absolute;
+      inset:-60px;
+      background: url("./BAF_logo.png") left 60% bottom 8% / 560px auto no-repeat;
+      opacity:.18;
+      filter: blur(12px) saturate(1.15) brightness(1.08);
+      transform: rotate(-5deg);
+      pointer-events:none;
+      z-index:0;
+    }
+    #globalCard::after{
+      content:"";
+      position:absolute;
+      inset:0;
+      background: radial-gradient(ellipse at 25% 70%, rgba(34,197,94,.20) 0%, rgba(17,24,39,0) 55%);
+      pointer-events:none;
+      z-index:0;
+    }
+/* === Footer: Design By + Logo (green blur background) === */
+.footer-brand {
+  position: relative;
+  margin: 14px 14px 18px;
+  padding: 16px 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: rgba(17,24,39,.55);
+  box-shadow: 0 14px 30px rgba(0,0,0,.18);
+}
+
+/* yeşil blur / glow efekti */
+.footer-brand::before{
+  content:"";
+  position:absolute;
+  inset:-40px;
+  background:
+    radial-gradient(circle at 20% 40%, rgba(34,197,94,.35), transparent 55%),
+    radial-gradient(circle at 80% 60%, rgba(34,197,94,.18), transparent 60%),
+    linear-gradient(180deg, rgba(15,23,42,.70), rgba(11,16,32,.75));
+  filter: blur(18px);
+  opacity: .95;
+  pointer-events:none;
+}
+
+.footer-brand::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  background: rgba(11,16,32,.35);
+  pointer-events:none;
+}
+
+.footer-brand .footer-inner{
+  position: relative;
+  z-index: 1;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.footer-brand .footer-text{
+  font-weight:800;
+  letter-spacing:.3px;
+  color: rgba(229,231,235,.92);
+}
+
+.footer-brand .footer-logo-wrap{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border: 1px solid rgba(34,197,94,.22);
+  background: rgba(11,18,37,.45);
+  border-radius: 14px;
+  padding: 8px 12px;
+}
+
+/* 808x371 oran bozulmasın: */
+.footer-brand img.footer-logo{
+  width: clamp(180px, 28vw, 320px); /* responsive */
+  max-width: 100%;
+  height: auto;
+  object-fit: contain;
+  display:block;
+  filter: drop-shadow(0 10px 22px rgba(34,197,94,.18));
+}
+
+/* mobilde daha güzel */
+@media (max-width: 480px){
+  .footer-brand{
+    margin: 12px;
+    padding: 14px 12px;
+  }
+  .footer-brand .footer-inner{
+    gap: 10px;
+  }
+}
+
+</style>
+</head>
+<body>
+  <div class="app">
+    <div style="width:100%">
+      <header>
+        <div class="brand">
+          <div class="logo" aria-hidden="true"></div>
+          <div>
+            <div class="title">Rent A Car Gelir Takip</div>
+            <div class="subtitle">Tamamen local'de çalışır • Plaka bazlı • Yıllık Döküm • Yakıt Gideri • Excel Rapor • Gün hesabı: 30 gün</div>
+          </div>
+        </div>
+
+        <div class="top-actions">
+          <label class="muted">Yıl</label>
+          <select id="yearSelect" class="select"></select>
+
+          <label class="muted">Ay</label>
+          <select id="monthSelect" class="select"></select>
+          <span id="jsBadge" class="tag warn">JS: yükleniyor… (v4.2.1 • 30 gün standardı)</span>
+
+          <button id="exportCurrentBtn" class="btn primary">📄 Seçili Aracı Excel</button>
+          <button id="exportAllBtn" class="btn">📚 Tüm Araçlar Excel</button>
+          <button id="backupBtn" class="btn">🧾 Yedek (JSON)</button>
+          <button id="restoreBtn" class="btn">♻️ Geri Yükle</button>
+          <button id="resetBtn" class="btn danger">🗑️ Sıfırla</button>
+        </div>
+      </header>
+
+      <div class="layout">
+        <aside>
+          <div class="card" style="margin-bottom:12px">
+            <div class="h">
+              <h2>Araçlar</h2>
+              <span class="muted" id="vehCount"></span>
+            </div>
+            <input id="vehSearch" class="input" placeholder="Plaka ara..." />
+            <div class="divider"></div>
+            <div class="row tight">
+              <input id="newPlate" class="input" placeholder="Plaka (örn: 20 APR 532)" />
+              <button id="addVehBtn" class="btn primary">➕ Ekle</button>
+            </div>
+            <div class="vehicles" id="vehList"></div>
+          </div>
+
+          <div class="card" id="globalCard">
+            <div class="h">
+              <h2>Genel Toplam</h2>
+              <span class="muted">Filtre: seçili yıl/ay</span>
+            </div>
+            <div class="kpi" id="globalKpi"></div>
+            <div class="footnote" style="margin-top:10px">
+              Not: Veriler tarayıcıda saklanır. Tarayıcı verilerini temizlersen her şey gider.
+              O yüzden düzenli <b>JSON yedek</b> alman şart.
+            </div>
+          </div>
+        </aside>
+
+        <main>
+          <div class="card" id="noVehicleCard">
+            <div class="h">
+              <h2>Başlamak için araç ekle</h2>
+              <span class="muted">Sol panelden plaka gir</span>
+            </div>
+            <div class="footnote">
+              Araç ekleyip kiralama + yakıt satırları girince;
+              gün sayısı + TL karşılığı + aylık kırılım otomatik oluşur.
+            </div>
+          </div>
+
+          <div id="vehicleArea" style="display:none">
+            <datalist id="plateDatalist"></datalist>
+
+            <div class="card">
+              <div class="h">
+                <div>
+                  <h2>Seçili Araç: <span id="activePlate" class="plate"></span></h2>
+                  <div class="muted">Kiralama satırı ekle / düzenle / sil</div>
+                </div>
+                <div class="row tight" style="justify-content:flex-end; align-items:end">
+                  <button id="deleteVehBtn" class="btn danger">🗑️ Aracı Sil</button>
+                </div>
+              </div>
+
+              <div class="grid2">
+                <div>
+                  <div class="muted small">Kiralama Kaydı</div>
+                  <div class="row">
+                    <input id="custName" class="input" placeholder="Müşteri Ad Soyad" />
+                    <select id="payType" class="select">
+                      <option value="NAKIT">Nakit</option>
+                      <option value="KART">Kart</option>
+                      <option value="IYZICO">İyzico</option>
+                      <option value="HAVALE">Havale/EFT</option>
+                      <option value="DIGER">Diğer</option>
+                    </select>
+                  </div>
+
+                  <div class="row tight" style="margin-top:10px">
+                    <div>
+                      <div class="muted small">Kiralama Tarihi</div>
+                      <input id="startDate" type="date" class="input" />
+                    </div>
+                    <div id="endDateWrap">
+                      <div class="muted small" id="endDateLabel">İade Tarihi</div>
+                      <input id="endDate" type="date" class="input" />
+                    </div>
+                    <div>
+                      <div class="muted small">Para Birimi</div>
+                      <select id="currency" class="select">
+                        <option value="TL">TL</option>
+                        <option value="EUR">EUR</option>
+                        <option value="USD">USD</option>
+                        <option value="GBP">GBP</option>
+                      </select>
+                    </div>
+                    <div>
+                      <div class="muted small">Toplam Tutar</div>
+                      <input id="amount" type="number" step="0.01" class="input" placeholder="0" />
+                    </div>
+                  </div>
+
+                  <div class="row tight" style="margin-top:10px">
+                    <div>
+                      <div class="muted small">EUR/TL Kur</div>
+                      <input id="eurRate" type="number" step="0.0001" class="input" placeholder="(gerekirse)" />
+                    </div>
+                    <div>
+                      <div class="muted small">USD/TL Kur</div>
+                      <input id="usdRate" type="number" step="0.0001" class="input" placeholder="(gerekirse)" />
+                    </div>
+                    <div>
+                      <div class="muted small">GBP/TL Kur</div>
+                      <input id="gbpRate" type="number" step="0.0001" class="input" placeholder="(gerekirse)" />
+                    </div>
+                    <div>
+                      <div class="muted small">Not</div>
+                      <input id="note" class="input" placeholder="Opsiyonel" />
+                    </div>
+                  </div>
+
+                  <div class="row tight" style="margin-top:10px; align-items:center">
+                    <label class="chip" style="flex:2; min-width:260px">
+                      <input id="carSwitch" type="checkbox" />
+                      Araç değişimi / uzatma (opsiyonel)
+                    </label>
+                    <div class="chip" id="calcPreview" style="flex:3">Gün: - • Günlük: - • TL: -</div>
+                  </div>
+
+                  <div id="switchFields" class="card inner" style="display:none">
+                    <div class="muted small" style="margin-bottom:6px">
+                      Araç değişimi: sistem kaydı <b>2 parçaya böler</b>. Eski araç: (başlangıç → değişim tarihi),
+                      Yeni araç: (değişim tarihi → nihai iade).
+                    </div>
+
+                    <div class="row tight">
+                      <div>
+                        <div class="muted small">Değişim Tarihi (Yeni aracı aldığı gün)</div>
+                        <input id="switchDate" type="date" class="input" />
+                      </div>
+                      <div>
+                        <div class="muted small">Yeni Araç Plaka</div>
+                        <input id="newPlateForSwitch" class="input" list="plateDatalist" placeholder="örn: 48 AIC 664" />
+                      </div>
+                    </div>
+
+                    <div class="row tight" style="margin-top:10px">
+                      <div>
+                        <div class="muted small">Eski Araç Teslim (otomatik)</div>
+                        <input id="oldEndPreview" type="date" class="input" disabled />
+                      </div>
+                      <div>
+                        <div class="muted small">Nihai İade Tarihi (Yeni araç)</div>
+                        <input id="endDate2" type="date" class="input" />
+                      </div>
+                    </div>
+
+                    <div class="footnote" style="margin-top:8px">
+                      <b>Nihai iade</b> = müşterinin en son aracı teslim ettiği gün. “Eski Araç Teslim” = değişim tarihidir (eski aracın teslim günü).
+                    </div>
+
+                    <div class="divider"></div>
+
+                    <div class="muted small">Yeni araç için (kalan süre) ödeme bilgisi</div>
+                    <div class="row tight" style="margin-top:8px">
+                      <div>
+                        <div class="muted small">Ödeme</div>
+                        <select id="payType2" class="select">
+                          <option value="">(aynı kalsın)</option>
+                          <option value="NAKIT">Nakit</option>
+                          <option value="KART">Kart</option>
+                          <option value="IYZICO">İyzico</option>
+                          <option value="HAVALE">Havale/EFT</option>
+                          <option value="DIGER">Diğer</option>
+                        </select>
+                      </div>
+                      <div>
+                        <div class="muted small">Para Birimi</div>
+                        <select id="currency2" class="select">
+                          <option value="">(aynı kalsın)</option>
+                          <option value="TL">TL</option>
+                          <option value="EUR">EUR</option>
+                          <option value="USD">USD</option>
+                          <option value="GBP">GBP</option>
+                        </select>
+                      </div>
+                      <div>
+                        <div class="muted small">Toplam Tutar (Yeni araç)</div>
+                        <input id="amount2" type="number" step="0.01" class="input" placeholder="Boş bırakırsan günlükten hesaplar" />
+                      </div>
+                      <div>
+                        <div class="muted small">Not (Yeni araç)</div>
+                        <input id="note2" class="input" placeholder="Opsiyonel" />
+                      </div>
+                    </div>
+
+                    <div class="row tight" style="margin-top:10px">
+                      <div>
+                        <div class="muted small">EUR/TL Kur</div>
+                        <input id="eurRate2" type="number" step="0.0001" class="input" placeholder="(gerekirse)" />
+                      </div>
+                      <div>
+                        <div class="muted small">USD/TL Kur</div>
+                        <input id="usdRate2" type="number" step="0.0001" class="input" placeholder="(gerekirse)" />
+                      </div>
+                      <div>
+                        <div class="muted small">GBP/TL Kur</div>
+                        <input id="gbpRate2" type="number" step="0.0001" class="input" placeholder="(gerekirse)" />
+                      </div>
+                      <div>
+                        <div class="chip" id="switchPreview" style="justify-content:center">Eski: - • Yeni: -</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="row tight" style="margin-top:10px">
+                    <button id="saveRentalBtn" class="btn primary">💾 Kaydet</button>
+                    <button id="cancelEditBtn" class="btn ghost" style="display:none">İptal</button>
+                  </div>
+
+                  <div class="footnote" style="margin-top:10px">
+                    Gün hesabı: <b>(İade - Kiralama) + 1</b>. Aynı gün alıp teslim = 1 gün.
+                    <br>Ay kırılımı: Kiralama birden fazla aya yayılıyorsa, sistem gün sayısına göre tutarı <b>orantısal</b> böler.
+                  </div>
+                </div>
+
+                <div>
+                  <div class="muted small">Hızlı Özet (Gelir + Yakıt)</div>
+                  <div class="kpi" id="vehicleKpi" style="margin-top:8px"></div>
+                  <div class="divider"></div>
+                  <div class="footnote">
+                    “Aylık Özet” tablosu gün kırılımını otomatik yapar. “Kur” sütunu: o ay içinde o para biriminde girilmiş
+                    <b>son kaydın kuru</b>.
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="h">
+                <h2>Kiralama Kayıtları</h2>
+                <span class="muted">Tablo seçili yıl/ay payını gösterir (kırılım dahil). Satıra tıklarsan düzenleme moduna geçer</span>
+              </div>
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>#</th>
+                      <th>Müşteri</th>
+                      <th>Kiralama</th>
+                      <th>İade</th>
+                      <th class="right">Gün</th>
+                      <th>Ödeme</th>
+                      <th>PB</th>
+                      <th class="right">Tutar</th>
+                      <th class="right">Günlük</th>
+                      <th class="right">EUR Kur</th>
+                      <th class="right">USD Kur</th>
+                      <th class="right">GBP Kur</th>
+                      <th class="right">TL Karşılığı</th>
+                      <th>Not</th>
+                      <th class="right">Sil</th>
+                    </tr>
+                  </thead>
+                  <tbody id="rentalsTbody"></tbody>
+                </table>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="h">
+                <h2>Yakıt Kayıtları</h2>
+                <span class="muted">Araç bazlı gider</span>
+              </div>
+
+              <div class="row tight">
+                <div>
+                  <div class="muted small">Tarih</div>
+                  <input id="fuelDate" type="date" class="input" />
+                </div>
+                <div>
+                  <div class="muted small">Litre</div>
+                  <input id="fuelLiters" type="number" step="0.01" class="input" placeholder="0" />
+                </div>
+                <div>
+                  <div class="muted small">Litre Fiyatı (TL)</div>
+                  <input id="fuelPrice" type="number" step="0.01" class="input" placeholder="0" />
+                </div>
+                <div>
+                  <div class="muted small">Toplam (TL)</div>
+                  <input id="fuelTotal" type="number" step="0.01" class="input" placeholder="0" />
+                </div>
+                <div>
+                  <div class="muted small">Not</div>
+                  <input id="fuelNote" class="input" placeholder="Opsiyonel" />
+                </div>
+              </div>
+
+              <div class="row tight" style="margin-top:10px">
+                <button id="saveFuelBtn" class="btn primary">⛽ Yakıt Kaydet</button>
+                <div class="chip" id="fuelPreview">Litre×Fiyat = Toplam</div>
+              </div>
+
+              <div class="divider"></div>
+
+              <div class="table-wrap">
+                <table style="min-width:920px">
+                  <thead>
+                    <tr>
+                      <th>#</th>
+                      <th>Tarih</th>
+                      <th class="right">Litre</th>
+                      <th class="right">Litre Fiyatı (TL)</th>
+                      <th class="right">Toplam (TL)</th>
+                      <th>Not</th>
+                      <th class="right">Sil</th>
+                    </tr>
+                  </thead>
+                  <tbody id="fuelTbody"></tbody>
+                </table>
+              </div>
+
+              <div class="footnote" style="margin-top:10px">
+                Yakıt kaydı TL bazlı tutulur. Yıl/ay filtresi “Hızlı Özet” ve “Genel Toplam”da uygulanır.
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="h">
+                <h2>Aylık Özet (Seçili Yıl)</h2>
+                <span class="muted">Araç bazlı • Ay kırılımı otomatik</span>
+              </div>
+              <div class="table-wrap">
+                <table style="min-width:1250px">
+                  <thead>
+                    <tr>
+                      <th>Ay</th>
+                      <th class="right">Toplam Gün</th>
+                      <th class="right">Toplam EUR</th>
+                      <th class="right">Ay Sonu EUR Kur (son)</th>
+                      <th class="right">Toplam GBP</th>
+                      <th class="right">Ay Sonu GBP Kur (son)</th>
+                      <th class="right">Toplam USD</th>
+                      <th class="right">Ay Sonu USD Kur (son)</th>
+                      <th class="right">Toplam TL (direkt)</th>
+                      <th class="right">TL Karşılığı (toplam)</th>
+                      <th class="right">Günlük Ortalama (TL)</th>
+                      <th class="right">Yakıt (TL)</th>
+                      <th class="right">Net (TL)</th>
+                    </tr>
+                  </thead>
+                  <tbody id="monthlyTbody"></tbody>
+                </table>
+              </div>
+              <div class="footnote" style="margin-top:10px">
+                “TL Karşılığı” satır bazında hesaplanır ve ay kırılımında gün oranıyla bölünür.
+              </div>
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+
+    <input id="restoreInput" type="file" accept="application/json" style="display:none" />
+  </div>
+
+<script>
+(() => {
+  const STORAGE_KEY = "rentacar_income_v1";
+
+  // Safe storage: file:// bazı tarayıcılarda localStorage erişimi hata verebilir.
+  // Bu katman, localStorage erişimi yoksa bellek içi yedek store kullanır.
+  const storage = (() => {
+    const mem = new Map();
+    let hasLocal = false;
+    try {
+      const t = "__rentacar_test__";
+      localStorage.setItem(t, "1");
+      localStorage.removeItem(t);
+      hasLocal = true;
+    } catch (_) {
+      hasLocal = false;
+    }
+    return {
+      hasLocal,
+      getItem: (k) => {
+        try {
+          return hasLocal ? localStorage.getItem(k) : (mem.get(k) ?? null);
+        } catch (_) {
+          return mem.get(k) ?? null;
+        }
+      },
+      setItem: (k, v) => {
+        try {
+          if (hasLocal) localStorage.setItem(k, v);
+          else mem.set(k, v);
+        } catch (_) {
+          mem.set(k, v);
+        }
+      },
+      removeItem: (k) => {
+        try {
+          if (hasLocal) localStorage.removeItem(k);
+          else mem.delete(k);
+        } catch (_) {
+          mem.delete(k);
+        }
+      }
+    };
+  })();
+
+  const MONTHS = ["OCAK","ŞUBAT","MART","NİSAN","MAYIS","HAZİRAN","TEMMUZ","AĞUSTOS","EYLÜL","EKİM","KASIM","ARALIK"];
+
+  const $ = (id) => document.getElementById(id);
+
+  const jsBadge = $("jsBadge");
+  function setJsBadge(text, cls="ok") {
+    if (!jsBadge) return;
+    jsBadge.textContent = text;
+    jsBadge.classList.remove("ok","warn","err");
+    jsBadge.classList.add(cls);
+  }
+  // Global error display (konsola ek olarak ekranda da görünsün)
+  window.addEventListener("error", (ev) => {
+    const msg = (ev?.message || "Bilinmeyen hata");
+    setJsBadge("JS HATA: " + msg, "err");
+  });
+
+
+  const state = {
+    version: 2,
+    vehicles: [],
+    ui: { activeVehicleId: null, editingRentalId: null }
+  };
+
+  function uid() {
+    return Math.random().toString(16).slice(2) + Date.now().toString(16);
+  }
+
+  function loadState() {
+    // Eski sürümlerden veri taşıma: v1 ve v2 anahtarlarını kontrol et
+    const rawV1 = storage.getItem("rentacar_income_v1");
+    const rawV2 = storage.getItem("rentacar_income_v2");
+    const raw = rawV1 || rawV2;
+    if (!raw) return;
+    try {
+      const parsed = JSON.parse(raw);
+      if (parsed && typeof parsed === "object") {
+        state.version = 2;
+        state.vehicles = Array.isArray(parsed.vehicles) ? parsed.vehicles : [];
+        state.ui = parsed.ui ?? { activeVehicleId: null, editingRentalId: null };
+      }
+    } catch (e) {
+      console.error("State parse error", e);
+    }
+
+    // normalize & migrate vehicles
+    state.vehicles.forEach(v => {
+      v.id = v.id || uid();
+      v.plate = normPlate(v.plate || "");
+      v.rentals = Array.isArray(v.rentals) ? v.rentals : [];
+      v.fuels = Array.isArray(v.fuels) ? v.fuels : [];
+      v.rentals.forEach(r => {
+        r.id = r.id || uid();
+        r.createdAt = r.createdAt || Date.now();
+        r.customer = (r.customer || "").trim();
+        r.payType = r.payType || "NAKIT";
+        r.currency = r.currency || "TL";
+        r.amount = num(r.amount);
+        r.eurRate = num(r.eurRate);
+        r.usdRate = num(r.usdRate);
+        r.gbpRate = num(r.gbpRate);
+        r.note = (r.note || "").trim();
+        r.startDate = r.startDate || "";
+        r.endDate = r.endDate || "";
+        // car switch meta (optional)
+        r.bookingId = r.bookingId || "";
+        r.segmentIndex = r.segmentIndex || 0; // 1/2
+        r.switchDate = r.switchDate || "";
+        r.switchedFromPlate = r.switchedFromPlate || "";
+        r.switchedToPlate = r.switchedToPlate || "";
+      });
+      v.fuels.forEach(f => {
+        f.id = f.id || uid();
+        f.date = f.date || "";
+        f.liters = num(f.liters);
+        f.price = num(f.price);
+        f.total = num(f.total) || (num(f.liters)*num(f.price));
+        f.note = (f.note || "").trim();
+        f.createdAt = f.createdAt || Date.now();
+      });
+    });
+
+    // if we came from v1, persist to v2 key
+    storage.setItem(STORAGE_KEY, JSON.stringify({version:2, vehicles: state.vehicles, ui: state.ui}));
+  }
+
+  function saveState() {
+    storage.setItem(STORAGE_KEY, JSON.stringify({
+      version: state.version,
+      vehicles: state.vehicles,
+      ui: state.ui
+    }));
+  }
+
+  function normPlate(p) {
+    return (p || "").trim().replace(/\s+/g, " ").toUpperCase();
+  }
+
+  function toISODate(d) { return d || ""; }
+
+  function parseDateLocal(iso) {
+    if (!iso) return null;
+    const [y,m,dd] = iso.split("-").map(Number);
+    return new Date(y, (m||1)-1, dd||1, 0,0,0,0);
+  }
+
+  function fmtISO(d) {
+    const y = d.getFullYear();
+    const m = String(d.getMonth()+1).padStart(2,"0");
+    const dd = String(d.getDate()).padStart(2,"0");
+    return `${y}-${m}-${dd}`;
+  }
+
+  function addDays(dateObj, days) {
+    const d = new Date(dateObj.getTime());
+    d.setDate(d.getDate()+days);
+    return d;
+  }
+
+  function isLastDayOfFeb(d) {
+    const y = d.getFullYear();
+    return d.getMonth() === 1 && d.getDate() === new Date(y, 2, 0).getDate();
+  }
+
+  // 30 gün standardı (30/360) - END DATE hariç (exclusive)
+  // Örnek: 2026-01-01 → 2026-02-01 = 30 gün
+  // Örnek: 2026-01-01 → 2026-01-02 = 1 gün
+  function day30(d) {
+    const dd = d.getDate();
+    if (dd === 31) return 30;
+    if (isLastDayOfFeb(d)) return 30;
+    return dd;
+  }
+
+  function serial30FromDate(d) {
+    const y = d.getFullYear();
+    const m = d.getMonth(); // 0-11
+    const d30 = day30(d);
+    return (y * 360) + (m * 30) + (d30 - 1); // day index 0..29
+  }
+
+  function daysCount(startISO, endISO) {
+    const s = parseDateLocal(startISO);
+    const e = parseDateLocal(endISO);
+    if (!s || !e) return 0;
+    const ss = serial30FromDate(s);
+    const ee = serial30FromDate(e);
+    const d = ee - ss;
+    return (d > 0) ? d : 0;
+  }
+
+
+  function splitRangeByMonth(startISO, endISO) {
+    // 30 gün standardına göre ay kırılımı (end date hariç)
+    // returns [{year, monthIndex, days}]
+    const s = parseDateLocal(startISO);
+    const e = parseDateLocal(endISO);
+    if (!s || !e) return [];
+    const ss = serial30FromDate(s);
+    const ee = serial30FromDate(e);
+    if (ee <= ss) return [];
+
+    const res = [];
+    const startYM = s.getFullYear() * 12 + s.getMonth();
+    const endYM = e.getFullYear() * 12 + e.getMonth();
+
+    for (let ym = startYM; ym <= endYM; ym++) {
+      const y = Math.floor(ym / 12);
+      const m = ym % 12;
+      const mStart = (y * 360) + (m * 30);
+      const mEnd = mStart + 30;
+      const overlap = Math.max(0, Math.min(ee, mEnd) - Math.max(ss, mStart));
+      if (overlap > 0) res.push({year: y, monthIndex: m, days: overlap});
+    }
+    return res;
+  }
+
+  function num(v) {
+    const n = Number(v);
+    return Number.isFinite(n) ? n : 0;
+  }
+
+  function currencyRate(r, cur) {
+    if (cur === "EUR") return num(r.eurRate);
+    if (cur === "USD") return num(r.usdRate);
+    if (cur === "GBP") return num(r.gbpRate);
+    return 1;
+  }
+
+  function tlEquivalent(amount, cur, r) {
+    const a = num(amount);
+    if (cur === "TL") return a;
+    const rate = currencyRate(r, cur);
+    return a * rate;
+  }
+
+  function fmtMoney(v, suffix="") {
+    const n = num(v);
+    return n.toLocaleString("tr-TR", {minimumFractionDigits: 2, maximumFractionDigits: 2}) + suffix;
+  }
+
+  function fmtRate(v) {
+    const n = num(v);
+    if (!n) return "";
+    return n.toLocaleString("tr-TR", {minimumFractionDigits: 4, maximumFractionDigits: 4});
+  }
+
+  function yearFromISO(iso) {
+    const d = parseDateLocal(iso);
+    return d ? d.getFullYear() : null;
+  }
+
+  function monthIndexFromISO(iso) {
+    const d = parseDateLocal(iso);
+    return d ? d.getMonth() : null;
+  }
+
+  function getActiveVehicle() {
+    return state.vehicles.find(v => v.id === state.ui.activeVehicleId) || null;
+  }
+
+  function findVehicleByPlate(plate) {
+    const p = normPlate(plate);
+    return state.vehicles.find(v => v.plate === p) || null;
+  }
+
+  function ensureVehicleExists(plate) {
+    const p = normPlate(plate);
+    if (!p) return null;
+    let v = findVehicleByPlate(p);
+    if (v) return v;
+    v = { id: uid(), plate: p, rentals: [], fuels: [] };
+    state.vehicles.unshift(v);
+    return v;
+  }
+
+  function ensureYearOptions() {
+    const ysel = $("yearSelect");
+    ysel.innerHTML = "";
+    const now = new Date();
+    const y = now.getFullYear();
+    const years = [];
+    for (let i = y-3; i <= y+1; i++) years.push(i);
+    years.forEach(yy => {
+      const opt = document.createElement("option");
+      opt.value = String(yy);
+      opt.textContent = String(yy);
+      ysel.appendChild(opt);
+    });
+    ysel.value = String(y);
+
+    const msel = $("monthSelect");
+    msel.innerHTML = "";
+    const optAll = document.createElement("option");
+    optAll.value = "ALL";
+    optAll.textContent = "Tümü";
+    msel.appendChild(optAll);
+    MONTHS.forEach((m, idx) => {
+      const o = document.createElement("option");
+      o.value = String(idx);
+      o.textContent = m;
+      msel.appendChild(o);
+    });
+    msel.value = "ALL";
+  }
+
+  function selectedYear() { return Number($("yearSelect").value); }
+  function selectedMonth() {
+    const v = $("monthSelect").value;
+    return v === "ALL" ? null : Number(v);
+  }
+
+  function addVehicle() {
+    const plate = normPlate($("newPlate").value);
+    if (!plate) return alert("Plaka boş olamaz.");
+    if (state.vehicles.some(v => v.plate === plate)) return alert("Bu plaka zaten var.");
+    const v = { id: uid(), plate, rentals: [], fuels: [] };
+    state.vehicles.unshift(v);
+    state.ui.activeVehicleId = v.id;
+    state.ui.editingRentalId = null;
+    $("newPlate").value = "";
+    saveState();
+    renderAll();
+  }
+
+  function deleteVehicle() {
+    const v = getActiveVehicle();
+    if (!v) return;
+    if (!confirm(`${v.plate} aracını ve tüm kayıtlarını silmek istiyor musun?`)) return;
+    state.vehicles = state.vehicles.filter(x => x.id !== v.id);
+    state.ui.activeVehicleId = state.vehicles[0]?.id || null;
+    state.ui.editingRentalId = null;
+    saveState();
+    renderAll();
+  }
+
+  function filteredVehicles() {
+    const q = normPlate($("vehSearch").value);
+    if (!q) return state.vehicles;
+    return state.vehicles.filter(v => v.plate.includes(q));
+  }
+
+  function renderDatalist() {
+    const dl = $("plateDatalist");
+    dl.innerHTML = "";
+    state.vehicles.forEach(v => {
+      const opt = document.createElement("option");
+      opt.value = v.plate;
+      dl.appendChild(opt);
+    });
+  }
+
+  function renderVehicleList() {
+    const list = $("vehList");
+    list.innerHTML = "";
+    const vs = filteredVehicles();
+    $("vehCount").textContent = `${state.vehicles.length} araç`;
+    renderDatalist();
+
+    vs.forEach(v => {
+      const div = document.createElement("div");
+      div.className = "veh" + (v.id === state.ui.activeVehicleId ? " active" : "");
+      const left = document.createElement("div");
+      left.innerHTML = `<div class="plate">${escapeHtml(v.plate)}</div><div class="muted small">${(v.rentals?.length || 0)} kiralama • ${(v.fuels?.length || 0)} yakıt</div>`;
+      const right = document.createElement("div");
+      right.innerHTML = `<span class="pill">Seç</span>`;
+      div.appendChild(left);
+      div.appendChild(right);
+      div.addEventListener("click", () => {
+        state.ui.activeVehicleId = v.id;
+        state.ui.editingRentalId = null;
+        clearRentalForm();
+        clearFuelForm();
+        saveState();
+        renderAll();
+      });
+      list.appendChild(div);
+    });
+  }
+
+  // ---- Allocation by month (splits one rental into month parts)
+  function allocateRentalParts(r) {
+    const totalDays = daysCount(r.startDate, r.endDate);
+    if (totalDays <= 0) return [];
+    const parts = splitRangeByMonth(r.startDate, r.endDate);
+    return parts.map(p => {
+      const ratio = p.days / totalDays;
+      const partAmount = num(r.amount) * ratio;
+      const cur = r.currency || "TL";
+      const tlEq = tlEquivalent(partAmount, cur, r);
+      return {
+        year: p.year,
+        monthIndex: p.monthIndex,
+        days: p.days,
+        amount: partAmount,
+        currency: cur,
+        tlEq
+      };
+    });
+  }
+
+  function computeFuelTotals(vehicle, year, month) {
+    const fuels = (vehicle.fuels || []).filter(f => {
+      const y = yearFromISO(f.date);
+      if (y !== year) return false;
+      if (month === null) return true;
+      return monthIndexFromISO(f.date) === month;
+    });
+    let total = 0;
+    fuels.forEach(f => total += num(f.total));
+    return { total, count: fuels.length };
+  }
+
+  function computeVehicleKpi(vehicle, year, month) {
+    // income split by month
+    let totalDays = 0;
+    let eur=0, usd=0, gbp=0, tl=0, tlEq=0, count=0;
+
+    (vehicle.rentals || []).forEach(r => {
+      const parts = allocateRentalParts(r);
+      const relevant = parts.filter(p => p.year === year && (month === null || p.monthIndex === month));
+      if (!relevant.length) return;
+
+      // days always from parts
+      relevant.forEach(p => {
+        totalDays += p.days;
+        tlEq += p.tlEq;
+
+        if (p.currency === "EUR") eur += p.amount;
+        if (p.currency === "USD") usd += p.amount;
+        if (p.currency === "GBP") gbp += p.amount;
+        if (p.currency === "TL")  tl  += p.amount;
+      });
+
+      // count: count record once if it has any part in selection
+      count += 1;
+    });
+
+    const avg = totalDays > 0 ? (tlEq / totalDays) : 0;
+    return { totalDays, eur, usd, gbp, tl, tlEq, avg, count };
+  }
+
+  function computeGlobalKpi(year, month) {
+    let totalDays=0, eur=0, usd=0, gbp=0, tl=0, tlEq=0, count=0;
+    let fuelTotal=0, fuelCount=0;
+
+    state.vehicles.forEach(v => {
+      const k = computeVehicleKpi(v, year, month);
+      totalDays += k.totalDays;
+      eur += k.eur; usd += k.usd; gbp += k.gbp; tl += k.tl; tlEq += k.tlEq; count += k.count;
+
+      const f = computeFuelTotals(v, year, month);
+      fuelTotal += f.total;
+      fuelCount += f.count;
+    });
+
+    const avg = totalDays > 0 ? (tlEq / totalDays) : 0;
+    const net = tlEq - fuelTotal;
+
+    return { totalDays, eur, usd, gbp, tl, tlEq, avg, count, fuelTotal, fuelCount, net };
+  }
+
+  function renderGlobalKpi() {
+    const year = selectedYear();
+    const month = selectedMonth();
+    const g = computeGlobalKpi(year, month);
+
+    const el = $("globalKpi");
+    el.innerHTML = "";
+    const chips = [
+      ["Kayıt", `${g.count}`],
+      ["Gün", `${g.totalDays}`],
+      ["EUR", fmtMoney(g.eur, " €")],
+      ["USD", fmtMoney(g.usd, " $")],
+      ["GBP", fmtMoney(g.gbp, " £")],
+      ["TL",  fmtMoney(g.tl, " ₺")],
+      ["TL Karşılığı", fmtMoney(g.tlEq, " ₺")],
+      ["Günlük Ort.", fmtMoney(g.avg, " ₺")],
+      ["Yakıt", fmtMoney(g.fuelTotal, " ₺")],
+      ["Net", fmtMoney(g.net, " ₺")]
+    ];
+    chips.forEach(([k,v]) => {
+      const c = document.createElement("div");
+      c.className = "chip";
+      c.innerHTML = `<span class="muted">${escapeHtml(k)}:</span> <b>${escapeHtml(v)}</b>`;
+      el.appendChild(c);
+    });
+  }
+
+  // ---- Rental Form
+  function clearSwitchFields() {
+    $("carSwitch").checked = false;
+    $("switchFields").style.display = "none";
+    if ($("endDateWrap")) $("endDateWrap").style.display = "";
+    if ($("endDateLabel")) $("endDateLabel").textContent = "İade Tarihi";
+    $("switchDate").value = "";
+    $("newPlateForSwitch").value = "";
+    if ($("oldEndPreview")) $("oldEndPreview").value = "";
+    if ($("endDate2")) $("endDate2").value = "";
+    $("payType2").value = "";
+    $("currency2").value = "";
+    $("amount2").value = "";
+    $("eurRate2").value = "";
+    $("usdRate2").value = "";
+    $("gbpRate2").value = "";
+    $("note2").value = "";
+    $("switchPreview").textContent = "Eski: - • Yeni: -";
+  }
+
+  function clearRentalForm() {
+    $("custName").value = "";
+    $("startDate").value = "";
+    $("endDate").value = "";
+    if ($("endDate2")) $("endDate2").value = "";
+    if ($("endDateWrap")) $("endDateWrap").style.display = "";
+    $("currency").value = "TL";
+    $("amount").value = "";
+    $("eurRate").value = "";
+    $("usdRate").value = "";
+    $("gbpRate").value = "";
+    $("payType").value = "NAKIT";
+    $("note").value = "";
+
+    clearSwitchFields();
+
+    state.ui.editingRentalId = null;
+    $("saveRentalBtn").textContent = "💾 Kaydet";
+    $("cancelEditBtn").style.display = "none";
+    saveState();
+    renderPreview();
+  }
+
+  function readFormRental() {
+    const isSwitch = $("carSwitch").checked;
+    const endVal = isSwitch ? (($("endDate2") && $("endDate2").value) ? $("endDate2").value : $("endDate").value) : $("endDate").value;
+    // keep endDate input synced for downstream logic
+    if (isSwitch && endVal) $("endDate").value = endVal;
+    return {
+      customer: $("custName").value.trim(),
+      startDate: toISODate($("startDate").value),
+      endDate: toISODate(endVal),
+      currency: $("currency").value,
+      amount: num($("amount").value),
+      eurRate: num($("eurRate").value),
+      usdRate: num($("usdRate").value),
+      gbpRate: num($("gbpRate").value),
+      payType: $("payType").value,
+      note: $("note").value.trim()
+    };
+  }
+
+  function readSwitchForm() {
+    return {
+      enabled: $("carSwitch").checked,
+      switchDate: toISODate($("switchDate").value),
+      newPlate: normPlate($("newPlateForSwitch").value),
+      payType2: $("payType2").value,
+      currency2: $("currency2").value,
+      amount2: ($("amount2").value === "" ? null : num($("amount2").value)),
+      eurRate2: num($("eurRate2").value),
+      usdRate2: num($("usdRate2").value),
+      gbpRate2: num($("gbpRate2").value),
+      note2: $("note2").value.trim()
+    };
+  }
+
+  function validateRentalBase(r) {
+    if (!r.customer) return "Müşteri adı boş olamaz.";
+    if (!r.startDate || !r.endDate) return "Kiralama ve iade tarihleri zorunlu.";
+    const d = daysCount(r.startDate, r.endDate);
+    if (d <= 0) return "Tarih aralığı hatalı (iade, kiralamadan önce olamaz).";
+    if (!r.amount || r.amount <= 0) return "Tutar 0 olamaz.";
+    if (r.currency !== "TL") {
+      const rate = currencyRate(r, r.currency);
+      if (!rate || rate <= 0) return `${r.currency}/TL kuru zorunlu ve 0'dan büyük olmalı.`;
+    }
+    return null;
+  }
+
+  function validateSwitch(r, s) {
+    if (!s.enabled) return null;
+    if (state.ui.editingRentalId) return "Araç değişimi özelliği düzenleme modunda kapalı. (2 kaydı ayrı ayrı düzenle.)";
+    if (!s.switchDate) return "Araç değişimi için değişim tarihi zorunlu.";
+    if (!s.newPlate) return "Araç değişimi için yeni plaka zorunlu.";
+    const sd = parseDateLocal(s.switchDate);
+    const st = parseDateLocal(r.startDate);
+    const en = parseDateLocal(r.endDate);
+    if (!sd || !st || !en) return "Tarihler geçersiz.";
+    if (!(sd > st && sd <= en)) return "Değişim tarihi kiralama tarihinden sonra ve iade tarihine eşit/önce olmalı.";
+    // new leg validation: if currency2 chosen or amount2 provided, ensure rates ok
+    const cur2 = s.currency2 || r.currency;
+    const amt2 = (s.amount2 === null ? null : num(s.amount2));
+    if (amt2 !== null && amt2 <= 0) return "Yeni araç tutarı 0 olamaz. (Boş bırakabilirsin.)";
+    if (cur2 !== "TL") {
+      const r2 = {
+        eurRate: s.eurRate2 || r.eurRate,
+        usdRate: s.usdRate2 || r.usdRate,
+        gbpRate: s.gbpRate2 || r.gbpRate,
+      };
+      const rate = currencyRate(r2, cur2);
+      if (!rate || rate <= 0) return `Yeni araç için ${cur2}/TL kuru zorunlu.`;
+    }
+    return null;
+  }
+
+  function renderPreview() {
+    const r = readFormRental();
+    const d = daysCount(r.startDate, r.endDate);
+    const daily = d > 0 ? (num(r.amount)/d) : 0;
+    const tlEq = tlEquivalent(num(r.amount), r.currency, r);
+
+    $("calcPreview").textContent =
+      `Gün: ${d || "-"} • Günlük: ${d ? fmtMoney(daily, " "+r.currency) : "-"} • TL: ${d ? fmtMoney(tlEq, " ₺") : "-"}`;
+
+    // Switch preview
+    const s = readSwitchForm();
+    if (!s.enabled) {
+      $("switchPreview").textContent = "Eski: - • Yeni: -";
+      if ($("oldEndPreview")) $("oldEndPreview").value = "";
+      if ($("endDate2")) $("endDate2").value = "";
+      return;
+    }
+    const sd = s.switchDate;
+    if (!sd || !r.startDate || !r.endDate) {
+      $("switchPreview").textContent = "Eski: - • Yeni: -";
+      return;
+    }
+    const sdObj = parseDateLocal(sd);
+    const oldEndISO = sd; // eski aracın teslim günü
+
+    if ($("oldEndPreview")) $("oldEndPreview").value = oldEndISO;
+    if ($("endDate2")) {
+      // ensure the "Nihai İade" field mirrors main end date
+      if ($("endDate2").value !== ($("endDate").value || "")) $("endDate2").value = ($("endDate").value || "");
+    }
+
+    const oldDays = daysCount(r.startDate, oldEndISO);
+    const newDays = daysCount(sd, r.endDate);
+
+    const dailyOld = oldDays>0 ? (num(r.amount)/oldDays) : 0;
+    const cur2 = s.currency2 || r.currency;
+    const r2 = {
+      eurRate: s.eurRate2 || r.eurRate,
+      usdRate: s.usdRate2 || r.usdRate,
+      gbpRate: s.gbpRate2 || r.gbpRate,
+    };
+    const amt2 = (s.amount2 === null) ? (dailyOld * newDays) : num(s.amount2);
+    const tlEq2 = tlEquivalent(amt2, cur2, r2);
+
+    $("switchPreview").textContent =
+      `Eski: ${oldDays||0} gün • Yeni: ${newDays||0} gün • Yeni TL: ${newDays?fmtMoney(tlEq2," ₺"):"-"}`;
+  }
+
+  function saveRental() {
+    const v = getActiveVehicle();
+    if (!v) return;
+    const r = readFormRental();
+    const err = validateRentalBase(r);
+    if (err) return alert(err);
+
+    const sw = readSwitchForm();
+    const swErr = validateSwitch(r, sw);
+    if (swErr) return alert(swErr);
+
+    if (sw.enabled) {
+      // Split into two rentals across plates
+      const bookingId = uid();
+
+      const oldEndISO = sw.switchDate; // eski aracın teslim günü
+
+      const oldDays = daysCount(r.startDate, oldEndISO);
+      const newDays = daysCount(sw.switchDate, r.endDate);
+      if (oldDays <= 0 || newDays <= 0) {
+        return alert("Araç değişimi için gün hesaplaması hatalı. (Değişim tarihi kontrol et.)");
+      }
+
+      // Old segment: keep on current vehicle (v)
+      const oldRental = {
+        id: uid(),
+        createdAt: Date.now(),
+        bookingId,
+        segmentIndex: 1,
+        switchDate: sw.switchDate,
+        switchedFromPlate: v.plate,
+        switchedToPlate: sw.newPlate,
+        ...r,
+        endDate: oldEndISO,
+        note: (r.note ? r.note + " | " : "") + `Araç değişimi → ${sw.newPlate} (${sw.switchDate})`
+      };
+
+      // New segment: create on new vehicle
+      const v2 = ensureVehicleExists(sw.newPlate);
+      const cur2 = sw.currency2 || r.currency;
+      const pay2 = sw.payType2 || r.payType;
+
+      // default new amount: old daily * newDays (editable if provided)
+      const dailyOld = num(r.amount)/oldDays;
+      const amount2 = (sw.amount2 === null) ? (dailyOld * newDays) : num(sw.amount2);
+
+      const r2rates = {
+        eurRate: sw.eurRate2 || r.eurRate,
+        usdRate: sw.usdRate2 || r.usdRate,
+        gbpRate: sw.gbpRate2 || r.gbpRate,
+      };
+
+      const newRental = {
+        id: uid(),
+        createdAt: Date.now(),
+        bookingId,
+        segmentIndex: 2,
+        switchDate: sw.switchDate,
+        switchedFromPlate: v.plate,
+        switchedToPlate: sw.newPlate,
+        customer: r.customer,
+        startDate: sw.switchDate,
+        endDate: r.endDate,
+        currency: cur2,
+        amount: amount2,
+        eurRate: r2rates.eurRate,
+        usdRate: r2rates.usdRate,
+        gbpRate: r2rates.gbpRate,
+        payType: pay2,
+        note: (sw.note2 ? sw.note2 + " | " : "") + `Araç değişimi ← ${v.plate} (${sw.switchDate})`
+      };
+
+      v.rentals.unshift(oldRental);
+      v.rentals.sort((a,b) => (b.startDate || "").localeCompare(a.startDate || ""));
+
+      v2.rentals.unshift(newRental);
+      v2.rentals.sort((a,b) => (b.startDate || "").localeCompare(a.startDate || ""));
+
+      // move active to new vehicle automatically (practical)
+      state.ui.activeVehicleId = v2.id;
+      state.ui.editingRentalId = null;
+
+      saveState();
+      clearRentalForm();
+      renderAll();
+      return;
+    }
+
+    // Normal single rental save
+    if (state.ui.editingRentalId) {
+      const idx = v.rentals.findIndex(x => x.id === state.ui.editingRentalId);
+      if (idx >= 0) {
+        v.rentals[idx] = { ...v.rentals[idx], ...r };
+      }
+    } else {
+      v.rentals.unshift({ id: uid(), createdAt: Date.now(), ...r });
+    }
+
+    v.rentals.sort((a,b) => (b.startDate || "").localeCompare(a.startDate || ""));
+    state.ui.editingRentalId = null;
+    saveState();
+    clearRentalForm();
+    renderAll();
+  }
+
+  function startEditRental(rid) {
+    const v = getActiveVehicle();
+    if (!v) return;
+    const r = v.rentals.find(x => x.id === rid);
+    if (!r) return;
+
+    $("custName").value = r.customer || "";
+    $("startDate").value = r.startDate || "";
+    $("endDate").value = r.endDate || "";
+    $("currency").value = r.currency || "TL";
+    $("amount").value = r.amount ?? "";
+    $("eurRate").value = r.eurRate ?? "";
+    $("usdRate").value = r.usdRate ?? "";
+    $("gbpRate").value = r.gbpRate ?? "";
+    $("payType").value = r.payType || "NAKIT";
+    $("note").value = r.note || "";
+
+    clearSwitchFields(); // editing doesn't support car switch to avoid complex linked edits
+
+    state.ui.editingRentalId = rid;
+    $("saveRentalBtn").textContent = "✅ Güncelle";
+    $("cancelEditBtn").style.display = "inline-flex";
+    saveState();
+    renderPreview();
+    window.scrollTo({top:0, behavior:"smooth"});
+  }
+
+  function deleteRental(rid) {
+    const v = getActiveVehicle();
+    if (!v) return;
+    const r = v.rentals.find(x => x.id === rid);
+    if (!r) return;
+
+    // If linked booking (switch), ask what to delete (clear & non-confusing)
+    if (r.bookingId && r.segmentIndex) {
+      const both = confirm(`Bu kayıt araç değişimiyle bağlantılı.
+
+İki parçayı BİRLİKTE silmek ister misin?
+
+OK = Evet (ikisi de silinir)
+İptal = Hayır`);
+      if (both) {
+        const bid = r.bookingId;
+        state.vehicles.forEach(vv => {
+          vv.rentals = (vv.rentals || []).filter(x => x.bookingId !== bid);
+        });
+        if (state.ui.editingRentalId) state.ui.editingRentalId = null;
+        saveState();
+        clearRentalForm();
+        renderAll();
+        return;
+      }
+
+      const single = confirm(`Sadece BU satırı silmek ister misin?
+
+OK = Evet (sadece bu satır)
+İptal = Vazgeç`);
+      if (!single) return;
+
+      v.rentals = (v.rentals || []).filter(x => x.id !== rid);
+      if (state.ui.editingRentalId === rid) clearRentalForm();
+      saveState();
+      renderAll();
+      return;
+    }
+
+    if (!confirm("Bu kiralama kaydını silmek istiyor musun?")) return;
+    v.rentals = (v.rentals || []).filter(x => x.id !== rid);
+    if (state.ui.editingRentalId === rid) {
+      clearRentalForm();
+    }
+    saveState();
+    renderAll();
+  }
+
+  function labelPayType(v) {
+    if (v === "NAKIT") return "Nakit";
+    if (v === "KART") return "Kart";
+    if (v === "IYZICO") return "İyzico";
+    if (v === "HAVALE") return "Havale/EFT";
+    if (v === "DIGER") return "Diğer";
+    return v || "";
+  }
+
+  
+function renderRentalsTable() {
+    const v = getActiveVehicle();
+    const tb = $("rentalsTbody");
+    tb.innerHTML = "";
+    if (!v) return;
+
+    const year = selectedYear();
+    const month = selectedMonth(); // null => tüm aylar
+
+    const rs = v.rentals || [];
+    let rowNo = 0;
+
+    rs.forEach((r) => {
+      const totalDays = daysCount(r.startDate, r.endDate);
+      if (totalDays <= 0) return;
+
+      const parts = allocateRentalParts(r);
+      const relevant = parts.filter(p => p.year === year && (month === null || p.monthIndex === month));
+      const filtDays = relevant.reduce((a,p)=>a+p.days,0);
+
+      // Seçili yıl/ayda hiç payı yoksa tabloya koyma (kafa karışmasın)
+      if (filtDays <= 0) return;
+
+      const cur = r.currency || "TL";
+      const totalAmount = num(r.amount);
+      const filtAmount = relevant.reduce((a,p)=>a+p.amount,0);
+
+      const daily = totalDays>0 ? (totalAmount/totalDays) : 0;
+
+      const totalTlEq = tlEquivalent(totalAmount, cur, r);
+      const filtTlEq  = relevant.reduce((a,p)=>a+p.tlEq,0);
+
+      const filterLabel = (month === null)
+        ? `${year} payı`
+        : `${MONTHS[month]} ${year} payı`;
+
+      const daySub = (filtDays !== totalDays)
+        ? `<div class="muted small">Toplam: ${totalDays}</div>`
+        : "";
+
+      const amountSub = (Math.abs(filtAmount - totalAmount) > 0.01)
+        ? `<div class="muted small">${escapeHtml(filterLabel)}: ${fmtMoney(filtAmount, " "+escapeHtml(cur))}</div>`
+        : "";
+
+      const tlSub = (Math.abs(filtTlEq - totalTlEq) > 0.01)
+        ? `<div class="muted small">Toplam: ${fmtMoney(totalTlEq, " ₺")}</div>`
+        : "";
+
+      const tag = (r.bookingId && r.segmentIndex)
+        ? `<span class="tag">↔ ${r.segmentIndex===1 ? "DEVİR→" : "DEVİR←"} ${escapeHtml(r.segmentIndex===1 ? (r.switchedToPlate||"") : (r.switchedFromPlate||""))}</span>`
+        : "";
+
+      rowNo += 1;
+
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>${rowNo}</td>
+        <td><b>${escapeHtml(r.customer||"")}</b>${tag}<div class="muted small">${escapeHtml(labelPayType(r.payType)||"")}</div></td>
+        <td>${escapeHtml(r.startDate||"")}</td>
+        <td>${escapeHtml(r.endDate||"")}</td>
+        <td class="right"><b>${filtDays}</b>${daySub}</td>
+        <td>${escapeHtml(labelPayType(r.payType))}</td>
+        <td><b>${escapeHtml(cur)}</b></td>
+        <td class="right"><div><b>${fmtMoney(totalAmount, " "+escapeHtml(cur))}</b></div>${amountSub}</td>
+        <td class="right">${fmtMoney(daily, " "+escapeHtml(cur))}</td>
+        <td class="right">${fmtRate(r.eurRate)}</td>
+        <td class="right">${fmtRate(r.usdRate)}</td>
+        <td class="right">${fmtRate(r.gbpRate)}</td>
+        <td class="right"><div><b>${fmtMoney(filtTlEq, " ₺")}</b></div>${tlSub}</td>
+        <td>${escapeHtml(r.note||"")}</td>
+        <td class="right"><button class="btn danger" data-del="${r.id}" style="padding:6px 8px; border-radius:10px">Sil</button></td>
+      `;
+      tr.addEventListener("click", (e) => {
+        if (e.target && e.target.matches("button[data-del]")) return;
+        startEditRental(r.id);
+      });
+      tr.querySelector(`button[data-del="${r.id}"]`).addEventListener("click", (e) => {
+        e.stopPropagation();
+        deleteRental(r.id);
+      });
+
+      tb.appendChild(tr);
+    });
+  }
+
+  function readFuelForm() {
+    return {
+      date: toISODate($("fuelDate").value),
+      liters: num($("fuelLiters").value),
+      price: num($("fuelPrice").value),
+      total: ($("fuelTotal").value === "" ? 0 : num($("fuelTotal").value)),
+      note: $("fuelNote").value.trim()
+    };
+  }
+
+  function renderFuelPreview() {
+    const liters = num($("fuelLiters").value);
+    const price = num($("fuelPrice").value);
+    const calc = liters * price;
+    const total = $("fuelTotal").value === "" ? calc : num($("fuelTotal").value);
+
+    $("fuelPreview").textContent = `Litre×Fiyat = ${fmtMoney(calc," ₺")} • Toplam = ${fmtMoney(total," ₺")}`;
+  }
+
+  function clearFuelForm() {
+    $("fuelDate").value = "";
+    $("fuelLiters").value = "";
+    $("fuelPrice").value = "";
+    $("fuelTotal").value = "";
+    $("fuelNote").value = "";
+    renderFuelPreview();
+  }
+
+  function validateFuel(f) {
+    if (!f.date) return "Yakıt tarihi zorunlu.";
+    if (f.liters <= 0 && f.total <= 0) return "Litre veya toplam girmen lazım.";
+    // If liters & price given but total empty, we'll compute
+    return null;
+  }
+
+  function saveFuel() {
+    const v = getActiveVehicle();
+    if (!v) return;
+    const f = readFuelForm();
+    const err = validateFuel(f);
+    if (err) return alert(err);
+
+    const liters = num(f.liters);
+    const price = num(f.price);
+    const computed = liters>0 && price>0 ? liters*price : 0;
+    const total = f.total>0 ? f.total : computed;
+    if (total <= 0) return alert("Toplam yakıt tutarı 0 olamaz.");
+
+    v.fuels.unshift({
+      id: uid(),
+      createdAt: Date.now(),
+      date: f.date,
+      liters,
+      price,
+      total,
+      note: f.note
+    });
+    v.fuels.sort((a,b) => (b.date || "").localeCompare(a.date || ""));
+    saveState();
+    clearFuelForm();
+    renderAll();
+  }
+
+  function deleteFuel(fid) {
+    const v = getActiveVehicle();
+    if (!v) return;
+    if (!confirm("Bu yakıt kaydını silmek istiyor musun?")) return;
+    v.fuels = (v.fuels || []).filter(x => x.id !== fid);
+    saveState();
+    renderAll();
+  }
+
+  function renderFuelTable() {
+    const v = getActiveVehicle();
+    const tb = $("fuelTbody");
+    tb.innerHTML = "";
+    if (!v) return;
+    (v.fuels || []).forEach((f, i) => {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>${i+1}</td>
+        <td>${escapeHtml(f.date||"")}</td>
+        <td class="right">${fmtMoney(f.liters,"")}</td>
+        <td class="right">${fmtMoney(f.price," ₺")}</td>
+        <td class="right"><b>${fmtMoney(f.total," ₺")}</b></td>
+        <td>${escapeHtml(f.note||"")}</td>
+        <td class="right"><button class="btn danger" data-del="${f.id}" style="padding:6px 8px; border-radius:10px">Sil</button></td>
+      `;
+      tr.querySelector(`button[data-del="${f.id}"]`).addEventListener("click", (e) => {
+        e.stopPropagation();
+        deleteFuel(f.id);
+      });
+      tb.appendChild(tr);
+    });
+  }
+
+  // ---- Monthly Summary (income is split by month, fuel is by date)
+  function monthlySummary(vehicle, year) {
+    const init = () => ({
+      days:0,
+      eur:0, usd:0, gbp:0, tl:0,
+      tlEq:0,
+      eurRateLast:0, usdRateLast:0, gbpRateLast:0,
+      fuel:0
+    });
+
+    const m = Array.from({length:12}, init);
+
+    // sort rentals asc so "last rate" becomes last by date
+    const rentals = (vehicle.rentals || []).slice().sort((a,b) => (a.startDate||"").localeCompare(b.startDate||""));
+    rentals.forEach(r => {
+      // update rateLast for the month(s) where it contributes (for readability, set per month part)
+      const parts = allocateRentalParts(r).filter(p => p.year === year);
+      parts.forEach(p => {
+        m[p.monthIndex].days += p.days;
+        if (p.currency === "EUR") m[p.monthIndex].eur += p.amount;
+        if (p.currency === "USD") m[p.monthIndex].usd += p.amount;
+        if (p.currency === "GBP") m[p.monthIndex].gbp += p.amount;
+        if (p.currency === "TL")  m[p.monthIndex].tl  += p.amount;
+        m[p.monthIndex].tlEq += p.tlEq;
+
+        // last rate per month (from record)
+        if (r.currency === "EUR" && num(r.eurRate)) m[p.monthIndex].eurRateLast = num(r.eurRate);
+        if (r.currency === "USD" && num(r.usdRate)) m[p.monthIndex].usdRateLast = num(r.usdRate);
+        if (r.currency === "GBP" && num(r.gbpRate)) m[p.monthIndex].gbpRateLast = num(r.gbpRate);
+      });
+    });
+
+    // fuel
+    (vehicle.fuels || []).forEach(f => {
+      const y = yearFromISO(f.date);
+      if (y !== year) return;
+      const mi = monthIndexFromISO(f.date);
+      if (mi === null) return;
+      m[mi].fuel += num(f.total);
+    });
+
+    return m;
+  }
+
+  function renderMonthlyTable() {
+    const v = getActiveVehicle();
+    const year = selectedYear();
+    const tb = $("monthlyTbody");
+    tb.innerHTML = "";
+    if (!v) return;
+
+    const m = monthlySummary(v, year);
+
+    let total = {days:0, eur:0, usd:0, gbp:0, tl:0, tlEq:0, fuel:0};
+
+    m.forEach((mm, idx) => {
+      total.days += mm.days;
+      total.eur += mm.eur;
+      total.usd += mm.usd;
+      total.gbp += mm.gbp;
+      total.tl  += mm.tl;
+      total.tlEq += mm.tlEq;
+      total.fuel += mm.fuel;
+
+      const avg = mm.days > 0 ? (mm.tlEq / mm.days) : 0;
+      const net = mm.tlEq - mm.fuel;
+
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td><b>${MONTHS[idx]}</b></td>
+        <td class="right">${mm.days}</td>
+        <td class="right">${mm.eur ? fmtMoney(mm.eur," €") : ""}</td>
+        <td class="right">${mm.eurRateLast ? fmtRate(mm.eurRateLast) : ""}</td>
+        <td class="right">${mm.gbp ? fmtMoney(mm.gbp," £") : ""}</td>
+        <td class="right">${mm.gbpRateLast ? fmtRate(mm.gbpRateLast) : ""}</td>
+        <td class="right">${mm.usd ? fmtMoney(mm.usd," $") : ""}</td>
+        <td class="right">${mm.usdRateLast ? fmtRate(mm.usdRateLast) : ""}</td>
+        <td class="right">${mm.tl ? fmtMoney(mm.tl," ₺") : ""}</td>
+        <td class="right"><b>${mm.tlEq ? fmtMoney(mm.tlEq," ₺") : ""}</b></td>
+        <td class="right">${mm.days ? fmtMoney(avg," ₺") : ""}</td>
+        <td class="right">${mm.fuel ? fmtMoney(mm.fuel," ₺") : ""}</td>
+        <td class="right"><b>${(mm.days || mm.fuel) ? fmtMoney(net," ₺") : ""}</b></td>
+      `;
+      tb.appendChild(tr);
+    });
+
+    const avgTotal = total.days > 0 ? (total.tlEq / total.days) : 0;
+    const netTotal = total.tlEq - total.fuel;
+
+    const trTot = document.createElement("tr");
+    trTot.innerHTML = `
+      <td><b>${escapeHtml(v.plate)} TOPLAM</b></td>
+      <td class="right"><b>${total.days}</b></td>
+      <td class="right"><b>${total.eur ? fmtMoney(total.eur," €") : ""}</b></td>
+      <td class="right"></td>
+      <td class="right"><b>${total.gbp ? fmtMoney(total.gbp," £") : ""}</b></td>
+      <td class="right"></td>
+      <td class="right"><b>${total.usd ? fmtMoney(total.usd," $") : ""}</b></td>
+      <td class="right"></td>
+      <td class="right"><b>${total.tl ? fmtMoney(total.tl," ₺") : ""}</b></td>
+      <td class="right"><b>${total.tlEq ? fmtMoney(total.tlEq," ₺") : ""}</b></td>
+      <td class="right"><b>${total.days ? fmtMoney(avgTotal," ₺") : ""}</b></td>
+      <td class="right"><b>${total.fuel ? fmtMoney(total.fuel," ₺") : ""}</b></td>
+      <td class="right"><b>${(total.days || total.fuel) ? fmtMoney(netTotal," ₺") : ""}</b></td>
+    `;
+    tb.appendChild(trTot);
+  }
+
+  function renderVehicleKpi() {
+    const v = getActiveVehicle();
+    const year = selectedYear();
+    const month = selectedMonth();
+    const el = $("vehicleKpi");
+    el.innerHTML = "";
+    if (!v) return;
+
+    const k = computeVehicleKpi(v, year, month);
+    const f = computeFuelTotals(v, year, month);
+    const net = k.tlEq - f.total;
+
+    const chips = [
+      ["Kayıt", `${k.count}`],
+      ["Gün", `${k.totalDays}`],
+      ["EUR", fmtMoney(k.eur," €")],
+      ["USD", fmtMoney(k.usd," $")],
+      ["GBP", fmtMoney(k.gbp," £")],
+      ["TL",  fmtMoney(k.tl," ₺")],
+      ["TL Karşılığı", fmtMoney(k.tlEq," ₺")],
+      ["Günlük Ort.", fmtMoney(k.avg," ₺")],
+      ["Yakıt", fmtMoney(f.total," ₺")],
+      ["Net", fmtMoney(net," ₺")]
+    ];
+    chips.forEach(([kk,vv]) => {
+      const c = document.createElement("div");
+      c.className = "chip";
+      c.innerHTML = `<span class="muted">${escapeHtml(kk)}:</span> <b>${escapeHtml(vv)}</b>`;
+      el.appendChild(c);
+    });
+  }
+
+  function renderMain() {
+    const v = getActiveVehicle();
+    const no = $("noVehicleCard");
+    const area = $("vehicleArea");
+    if (!v) {
+      no.style.display = "";
+      area.style.display = "none";
+      return;
+    }
+    no.style.display = "none";
+    area.style.display = "";
+    $("activePlate").textContent = v.plate;
+
+    renderVehicleKpi();
+    renderRentalsTable();
+    renderFuelTable();
+    renderMonthlyTable();
+    renderPreview();
+    renderFuelPreview();
+  }
+
+  function renderAll() {
+    renderVehicleList();
+    renderGlobalKpi();
+    renderMain();
+  }
+
+  function escapeHtml(s) {
+    return String(s ?? "")
+      .replaceAll("&","&amp;")
+      .replaceAll("<","&lt;")
+      .replaceAll(">","&gt;")
+      .replaceAll('"',"&quot;")
+      .replaceAll("'","&#039;");
+  }
+
+  // ---------- Excel Export (XML Spreadsheet 2003) ----------
+  function xmlEscape(s) {
+    return String(s ?? "")
+      .replaceAll("&","&amp;")
+      .replaceAll("<","&lt;")
+      .replaceAll(">","&gt;")
+      .replaceAll('"',"&quot;")
+      .replaceAll("'","&apos;");
+  }
+
+  function buildExcelXmlWorkbook(sheets) {
+    const header =
+`<?xml version="1.0"?>
+<?mso-application progid="Excel.Sheet"?>
+<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"
+ xmlns:o="urn:schemas-microsoft-com:office:office"
+ xmlns:x="urn:schemas-microsoft-com:office:excel"
+ xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet">
+`;
+    const footer = `</Workbook>`;
+
+    const ws = sheets.map(sh => {
+      const name = xmlEscape(sh.name).slice(0,31) || "Sheet";
+      const rowsXml = (sh.rows || []).map(row => {
+        const cells = row.map(val => {
+          const v = (val ?? "").toString();
+          return `<Cell><Data ss:Type="String">${xmlEscape(v)}</Data></Cell>`;
+        }).join("");
+        return `<Row>${cells}</Row>`;
+      }).join("\n");
+      return `<Worksheet ss:Name="${name}"><Table>${rowsXml}</Table></Worksheet>`;
+    }).join("\n");
+
+    return header + ws + "\n" + footer;
+  }
+
+  function downloadBlob(filename, mime, content) {
+    const blob = new Blob([content], {type: mime});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(()=>URL.revokeObjectURL(url), 1500);
+  }
+
+  function exportVehicleExcel(vehicle) {
+    const year = selectedYear();
+
+    // Rentals raw
+    const rRows = [];
+    rRows.push(["Plaka", vehicle.plate]);
+    rRows.push(["Yıl", String(year)]);
+    rRows.push([""]);
+    rRows.push(["Kiralama Kayıtları (Ham)"]);
+    rRows.push(["#", "Müşteri", "Kiralama", "İade", "Gün", "Ödeme", "PB", "Tutar", "Günlük", "EUR Kur", "USD Kur", "GBP Kur", "TL Karşılığı", "Not", "Araç Değişimi"]);
+    const rentals = (vehicle.rentals || []).filter(r => {
+      // include if any part in this year
+      return allocateRentalParts(r).some(p => p.year === year);
+    });
+    rentals.forEach((r, i) => {
+      const d = daysCount(r.startDate, r.endDate);
+      const daily = d>0 ? (num(r.amount)/d) : 0;
+      const tlEq = tlEquivalent(num(r.amount), r.currency, r);
+      const swap = (r.bookingId && r.segmentIndex) ? `EVET (${r.segmentIndex}/2, ${r.switchDate || ""})` : "";
+      rRows.push([
+        String(i+1),
+        r.customer || "",
+        r.startDate || "",
+        r.endDate || "",
+        String(d),
+        labelPayType(r.payType),
+        r.currency || "",
+        fmtMoney(r.amount, " "+(r.currency||"")),
+        fmtMoney(daily, " "+(r.currency||"")),
+        r.eurRate ? fmtRate(r.eurRate) : "",
+        r.usdRate ? fmtRate(r.usdRate) : "",
+        r.gbpRate ? fmtRate(r.gbpRate) : "",
+        fmtMoney(tlEq, " ₺"),
+        r.note || "",
+        swap
+      ]);
+    });
+
+    // Monthly summary (allocated)
+    const ms = monthlySummary(vehicle, year);
+    const mRows = [];
+    mRows.push(["Ay", "Toplam Gün", "Toplam EUR", "Ay Sonu EUR Kur (son)", "Toplam GBP", "Ay Sonu GBP Kur (son)", "Toplam USD", "Ay Sonu USD Kur (son)", "Toplam TL (direkt)", "TL Karşılığı (toplam)", "Günlük Ortalama (TL)", "Yakıt (TL)", "Net (TL)"]);
+    let totals = {days:0, eur:0, usd:0, gbp:0, tl:0, tlEq:0, fuel:0};
+    ms.forEach((mm, idx) => {
+      totals.days += mm.days;
+      totals.eur += mm.eur;
+      totals.usd += mm.usd;
+      totals.gbp += mm.gbp;
+      totals.tl  += mm.tl;
+      totals.tlEq += mm.tlEq;
+      totals.fuel += mm.fuel;
+
+      const avg = mm.days > 0 ? (mm.tlEq/mm.days) : 0;
+      const net = mm.tlEq - mm.fuel;
+
+      mRows.push([
+        MONTHS[idx],
+        String(mm.days),
+        mm.eur ? fmtMoney(mm.eur," €") : "",
+        mm.eurRateLast ? fmtRate(mm.eurRateLast) : "",
+        mm.gbp ? fmtMoney(mm.gbp," £") : "",
+        mm.gbpRateLast ? fmtRate(mm.gbpRateLast) : "",
+        mm.usd ? fmtMoney(mm.usd," $") : "",
+        mm.usdRateLast ? fmtRate(mm.usdRateLast) : "",
+        mm.tl ? fmtMoney(mm.tl," ₺") : "",
+        mm.tlEq ? fmtMoney(mm.tlEq," ₺") : "",
+        mm.days ? fmtMoney(avg," ₺") : "",
+        mm.fuel ? fmtMoney(mm.fuel," ₺") : "",
+        (mm.days||mm.fuel) ? fmtMoney(net," ₺") : ""
+      ]);
+    });
+    const avgT = totals.days>0 ? (totals.tlEq/totals.days) : 0;
+    const netT = totals.tlEq - totals.fuel;
+    mRows.push([
+      vehicle.plate + " TOPLAM",
+      String(totals.days),
+      totals.eur ? fmtMoney(totals.eur," €") : "",
+      "",
+      totals.gbp ? fmtMoney(totals.gbp," £") : "",
+      "",
+      totals.usd ? fmtMoney(totals.usd," $") : "",
+      "",
+      totals.tl ? fmtMoney(totals.tl," ₺") : "",
+      totals.tlEq ? fmtMoney(totals.tlEq," ₺") : "",
+      totals.days ? fmtMoney(avgT," ₺") : "",
+      totals.fuel ? fmtMoney(totals.fuel," ₺") : "",
+      (totals.days||totals.fuel) ? fmtMoney(netT," ₺") : ""
+    ]);
+
+    // Fuel list
+    const fRows = [];
+    fRows.push(["Plaka", vehicle.plate]);
+    fRows.push(["Yıl", String(year)]);
+    fRows.push([""]);
+    fRows.push(["Yakıt Kayıtları"]);
+    fRows.push(["#", "Tarih", "Litre", "Litre Fiyatı (TL)", "Toplam (TL)", "Not"]);
+    const fuels = (vehicle.fuels || []).filter(f => yearFromISO(f.date) === year);
+    fuels.forEach((f,i) => {
+      fRows.push([
+        String(i+1),
+        f.date || "",
+        fmtMoney(f.liters,""),
+        fmtMoney(f.price," ₺"),
+        fmtMoney(f.total," ₺"),
+        f.note || ""
+      ]);
+    });
+    const fuelTotal = fuels.reduce((a,f)=>a+num(f.total),0);
+    fRows.push(["TOPLAM","","","","", fmtMoney(fuelTotal," ₺")]);
+
+    const wb = buildExcelXmlWorkbook([
+      { name: "Kayıtlar", rows: rRows },
+      { name: "Aylık Özet", rows: mRows },
+      { name: "Yakıt", rows: fRows }
+    ]);
+
+    const file = `Gelir_${vehicle.plate.replaceAll(" ","_")}_${year}.xls`;
+    downloadBlob(file, "application/vnd.ms-excel;charset=utf-8", wb);
+  }
+
+  function exportAllExcel() {
+    const year = selectedYear();
+
+    // Global income+fuel summary
+    const gRows = [];
+    gRows.push(["Yıl", String(year)]);
+    gRows.push([""]);
+    gRows.push(["Araç", "Kiralama Kayıt", "Kiralama Gün", "EUR", "USD", "GBP", "TL (direkt)", "TL Karşılığı", "Günlük Ort. (TL)", "Yakıt (TL)", "Net (TL)"]);
+    state.vehicles.forEach(v => {
+      const k = computeVehicleKpi(v, year, null);
+      const f = computeFuelTotals(v, year, null);
+      const net = k.tlEq - f.total;
+      gRows.push([
+        v.plate,
+        String(k.count),
+        String(k.totalDays),
+        fmtMoney(k.eur," €"),
+        fmtMoney(k.usd," $"),
+        fmtMoney(k.gbp," £"),
+        fmtMoney(k.tl," ₺"),
+        fmtMoney(k.tlEq," ₺"),
+        fmtMoney(k.avg," ₺"),
+        fmtMoney(f.total," ₺"),
+        fmtMoney(net," ₺")
+      ]);
+    });
+    const g = computeGlobalKpi(year, null);
+    gRows.push([
+      "GENEL TOPLAM",
+      String(g.count),
+      String(g.totalDays),
+      fmtMoney(g.eur," €"),
+      fmtMoney(g.usd," $"),
+      fmtMoney(g.gbp," £"),
+      fmtMoney(g.tl," ₺"),
+      fmtMoney(g.tlEq," ₺"),
+      fmtMoney(g.avg," ₺"),
+      fmtMoney(g.fuelTotal," ₺"),
+      fmtMoney(g.net," ₺")
+    ]);
+
+    const sheets = [{name:"Genel Özet", rows:gRows}];
+
+    // Fuel summary sheet
+    const fuelRows = [];
+    fuelRows.push(["Yıl", String(year)]);
+    fuelRows.push([""]);
+    fuelRows.push(["Araç", "Yakıt Kayıt", "Yakıt Toplam (TL)"]);
+    state.vehicles.forEach(v => {
+      const f = computeFuelTotals(v, year, null);
+      fuelRows.push([v.plate, String(f.count), fmtMoney(f.total," ₺")]);
+    });
+    fuelRows.push(["GENEL TOPLAM", "", fmtMoney(g.fuelTotal," ₺")]);
+    sheets.push({name:"Yakıt Özet", rows:fuelRows});
+
+    // Each vehicle sheet (rentals raw)
+    state.vehicles.forEach(v => {
+      const rRows = [];
+      rRows.push(["Plaka", v.plate]);
+      rRows.push([""]);
+      rRows.push(["#", "Müşteri", "Kiralama", "İade", "Gün", "Ödeme", "PB", "Tutar", "EUR Kur", "USD Kur", "GBP Kur", "Not"]);
+      const rentals = (v.rentals || []).filter(r => allocateRentalParts(r).some(p=>p.year===year));
+      rentals.forEach((r, i) => {
+        const d = daysCount(r.startDate, r.endDate);
+        rRows.push([
+          String(i+1),
+          r.customer || "",
+          r.startDate || "",
+          r.endDate || "",
+          String(d),
+          labelPayType(r.payType),
+          r.currency || "",
+          fmtMoney(r.amount, " "+(r.currency||"")),
+          r.eurRate ? fmtRate(r.eurRate) : "",
+          r.usdRate ? fmtRate(r.usdRate) : "",
+          r.gbpRate ? fmtRate(r.gbpRate) : "",
+          r.note || ""
+        ]);
+      });
+      sheets.push({name: v.plate.slice(0,31), rows: rRows});
+    });
+
+    const wb = buildExcelXmlWorkbook(sheets);
+    downloadBlob(`Tum_Araclar_${year}.xls`, "application/vnd.ms-excel;charset=utf-8", wb);
+  }
+
+  // ---------- Backup / Restore ----------
+  function backupJson() {
+    const data = JSON.stringify({
+      version: state.version,
+      vehicles: state.vehicles,
+      ui: state.ui
+    }, null, 2);
+    downloadBlob(`rentacar_yedek_${Date.now()}.json`, "application/json;charset=utf-8", data);
+  }
+
+  function restoreJsonFile(file) {
+    const fr = new FileReader();
+    fr.onload = () => {
+      try {
+        const parsed = JSON.parse(fr.result);
+        if (!parsed || typeof parsed !== "object" || !Array.isArray(parsed.vehicles)) {
+          return alert("Geçersiz yedek dosyası.");
+        }
+        state.version = 2;
+        state.vehicles = parsed.vehicles;
+        state.ui = parsed.ui ?? { activeVehicleId: state.vehicles[0]?.id || null, editingRentalId: null };
+        if (!state.ui.activeVehicleId && state.vehicles[0]) state.ui.activeVehicleId = state.vehicles[0].id;
+        state.ui.editingRentalId = null;
+
+        // normalize after restore
+        state.vehicles.forEach(v => {
+          v.id = v.id || uid();
+          v.plate = normPlate(v.plate || "");
+          v.rentals = Array.isArray(v.rentals) ? v.rentals : [];
+          v.fuels = Array.isArray(v.fuels) ? v.fuels : [];
+        });
+
+        saveState();
+        clearRentalForm();
+        clearFuelForm();
+        renderAll();
+        alert("Yedek geri yüklendi.");
+      } catch(e) {
+        alert("Yedek okunamadı: " + e.message);
+      }
+    };
+    fr.readAsText(file);
+  }
+
+  function resetAll() {
+    if (!confirm("Tüm veriler silinecek. Emin misin?")) return;
+    storage.removeItem(STORAGE_KEY);
+    storage.removeItem("rentacar_income_v1");
+    state.vehicles = [];
+    state.ui.activeVehicleId = null;
+    state.ui.editingRentalId = null;
+    renderAll();
+  }
+
+  // ---------- Events ----------
+  function bind() {
+    $("addVehBtn").addEventListener("click", addVehicle);
+    $("newPlate").addEventListener("keydown", (e)=>{ if(e.key==="Enter") addVehicle(); });
+    $("vehSearch").addEventListener("input", renderVehicleList);
+
+    $("deleteVehBtn").addEventListener("click", deleteVehicle);
+
+    // preview updates
+    ["custName","startDate","endDate","currency","amount","eurRate","usdRate","gbpRate","payType","note",
+     "carSwitch","switchDate","newPlateForSwitch","endDate2","payType2","currency2","amount2","eurRate2","usdRate2","gbpRate2","note2"
+    ].forEach(id=>{
+      $(id).addEventListener("input", renderPreview);
+      $(id).addEventListener("change", renderPreview);
+    });
+
+    $("carSwitch").addEventListener("change", () => {
+      const on = $("carSwitch").checked;
+      $("switchFields").style.display = on ? "" : "none";
+      // When switch is enabled, show "Nihai İade" inside the switch panel to reduce confusion.
+      if ($("endDateWrap")) $("endDateWrap").style.display = on ? "none" : "";
+      if ($("endDateLabel")) $("endDateLabel").textContent = on ? "Nihai İade Tarihi (Yeni araç)" : "İade Tarihi";
+      if (on && $("endDate2")) $("endDate2").value = ($("endDate").value || "");
+      renderPreview();
+    });
+
+    // keep end dates synced
+    if ($("endDate2")) {
+      $("endDate2").addEventListener("change", () => { $("endDate").value = $("endDate2").value; renderPreview(); });
+      $("endDate2").addEventListener("input", () => { $("endDate").value = $("endDate2").value; renderPreview(); });
+    }
+    $("endDate").addEventListener("change", () => { if ($("carSwitch").checked && $("endDate2")) $("endDate2").value = $("endDate").value; renderPreview(); });
+
+
+    $("saveRentalBtn").addEventListener("click", saveRental);
+    $("cancelEditBtn").addEventListener("click", clearRentalForm);
+
+    $("yearSelect").addEventListener("change", () => {
+      renderGlobalKpi();
+      renderVehicleKpi();
+      renderMonthlyTable();
+    });
+    $("monthSelect").addEventListener("change", () => {
+      renderGlobalKpi();
+      renderVehicleKpi();
+    });
+
+    $("exportCurrentBtn").addEventListener("click", () => {
+      const v = getActiveVehicle();
+      if (!v) return alert("Önce araç seç.");
+      exportVehicleExcel(v);
+    });
+    $("exportAllBtn").addEventListener("click", () => {
+      if (!state.vehicles.length) return alert("Araç yok.");
+      exportAllExcel();
+    });
+
+    $("backupBtn").addEventListener("click", backupJson);
+
+    $("restoreBtn").addEventListener("click", () => $("restoreInput").click());
+    $("restoreInput").addEventListener("change", (e) => {
+      const file = e.target.files?.[0];
+      if (file) restoreJsonFile(file);
+      e.target.value = "";
+    });
+
+    $("resetBtn").addEventListener("click", resetAll);
+
+    // Fuel
+    ["fuelDate","fuelLiters","fuelPrice","fuelTotal","fuelNote"].forEach(id=>{
+      $(id).addEventListener("input", renderFuelPreview);
+      $(id).addEventListener("change", renderFuelPreview);
+    });
+    $("saveFuelBtn").addEventListener("click", saveFuel);
+  }
+
+  // ---------- Start ----------
+  loadState();
+  ensureYearOptions();
+  if (!state.ui.activeVehicleId && state.vehicles[0]) state.ui.activeVehicleId = state.vehicles[0].id;
+  bind();
+  renderAll();
+  setJsBadge(storage.hasLocal ? "JS: aktif" : "JS: aktif (localStorage kapalı)", storage.hasLocal ? "ok" : "warn");
+
+  // ---------- Service Worker (GitHub Pages offline cache) ----------
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("./sw.js?ver=4-1").catch(()=>{});
+  }
+})();
+</script>
+<footer class="footer-brand">
+  <div class="footer-inner">
+    <div class="footer-text">2026 © </div>
+
+    <div class="footer-logo-wrap">
+      <img
+        class="footer-logo"
+        src="https://i.ibb.co/DH2mWWWD/footer-logo.png"
+        alt="Designed By Logo"
+        loading="lazy"
+        onerror="this.style.display='none';"
+      />
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
