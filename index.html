@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <meta name="theme-color" content="#111827" />
-  <title>Rent A Car Gelir Takip</title>
+  <title>Rent A Car Gelir Takip (Offline)</title>
   <link rel="manifest" href="manifest.webmanifest">
   <style>
     :root{
@@ -183,86 +183,6 @@
       pointer-events:none;
       z-index:0;
     }
-/* === Footer: Design By + Logo (green blur background) === */
-.footer-brand {
-  position: relative;
-  margin: 14px 14px 18px;
-  padding: 16px 14px;
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-  overflow: hidden;
-  background: rgba(17,24,39,.55);
-  box-shadow: 0 14px 30px rgba(0,0,0,.18);
-}
-
-/* yeşil blur / glow efekti */
-.footer-brand::before{
-  content:"";
-  position:absolute;
-  inset:-40px;
-  background:
-    radial-gradient(circle at 20% 40%, rgba(34,197,94,.35), transparent 55%),
-    radial-gradient(circle at 80% 60%, rgba(34,197,94,.18), transparent 60%),
-    linear-gradient(180deg, rgba(15,23,42,.70), rgba(11,16,32,.75));
-  filter: blur(18px);
-  opacity: .95;
-  pointer-events:none;
-}
-
-.footer-brand::after{
-  content:"";
-  position:absolute;
-  inset:0;
-  background: rgba(11,16,32,.35);
-  pointer-events:none;
-}
-
-.footer-brand .footer-inner{
-  position: relative;
-  z-index: 1;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  gap: 12px;
-  flex-wrap: wrap;
-}
-
-.footer-brand .footer-text{
-  font-weight:800;
-  letter-spacing:.3px;
-  color: rgba(229,231,235,.92);
-}
-
-.footer-brand .footer-logo-wrap{
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  border: 1px solid rgba(34,197,94,.22);
-  background: rgba(11,18,37,.45);
-  border-radius: 14px;
-  padding: 8px 12px;
-}
-
-/* 808x371 oran bozulmasın: */
-.footer-brand img.footer-logo{
-  width: clamp(180px, 28vw, 320px); /* responsive */
-  max-width: 100%;
-  height: auto;
-  object-fit: contain;
-  display:block;
-  filter: drop-shadow(0 10px 22px rgba(34,197,94,.18));
-}
-
-/* mobilde daha güzel */
-@media (max-width: 480px){
-  .footer-brand{
-    margin: 12px;
-    padding: 14px 12px;
-  }
-  .footer-brand .footer-inner{
-    gap: 10px;
-  }
-}
 
 </style>
 </head>
@@ -274,7 +194,7 @@
           <div class="logo" aria-hidden="true"></div>
           <div>
             <div class="title">Rent A Car Gelir Takip</div>
-            <div class="subtitle">Tamamen local'de çalışır • Plaka bazlı • Yıllık Döküm • Yakıt Gideri • Excel Rapor • Gün hesabı: 30 gün</div>
+            <div class="subtitle">Tamamen local çalışır</div>
           </div>
         </div>
 
@@ -284,7 +204,7 @@
 
           <label class="muted">Ay</label>
           <select id="monthSelect" class="select"></select>
-          <span id="jsBadge" class="tag warn">JS: yükleniyor… (v4.2.1 • 30 gün standardı)</span>
+          <span id="jsBadge" class="tag warn">JS: yükleniyor… (v4.3.0 • 31 gün = 30)</span>
 
           <button id="exportCurrentBtn" class="btn primary">📄 Seçili Aracı Excel</button>
           <button id="exportAllBtn" class="btn">📚 Tüm Araçlar Excel</button>
@@ -366,11 +286,11 @@
                   <div class="row tight" style="margin-top:10px">
                     <div>
                       <div class="muted small">Kiralama Tarihi</div>
-                      <input id="startDate" type="date" class="input" />
+                      <input id="startDate" type="date" class="input" min="2000-01-01" max="2100-12-31" />
                     </div>
                     <div id="endDateWrap">
                       <div class="muted small" id="endDateLabel">İade Tarihi</div>
-                      <input id="endDate" type="date" class="input" />
+                      <input id="endDate" type="date" class="input" min="2000-01-01" max="2100-12-31" />
                     </div>
                     <div>
                       <div class="muted small">Para Birimi</div>
@@ -423,7 +343,7 @@
                     <div class="row tight">
                       <div>
                         <div class="muted small">Değişim Tarihi (Yeni aracı aldığı gün)</div>
-                        <input id="switchDate" type="date" class="input" />
+                        <input id="switchDate" type="date" class="input" min="2000-01-01" max="2100-12-31" />
                       </div>
                       <div>
                         <div class="muted small">Yeni Araç Plaka</div>
@@ -438,7 +358,7 @@
                       </div>
                       <div>
                         <div class="muted small">Nihai İade Tarihi (Yeni araç)</div>
-                        <input id="endDate2" type="date" class="input" />
+                        <input id="endDate2" type="date" class="input" min="2000-01-01" max="2100-12-31" />
                       </div>
                     </div>
 
@@ -506,7 +426,7 @@
                   </div>
 
                   <div class="footnote" style="margin-top:10px">
-                    Gün hesabı: <b>(İade - Kiralama) + 1</b>. Aynı gün alıp teslim = 1 gün.
+                    Gün hesabı: <b>İade tarihi hariç</b>. Örn: 15 → 28 = 13 gün. <b>Ayın 31'i ücretlendirilmez</b> (31=30).
                     <br>Ay kırılımı: Kiralama birden fazla aya yayılıyorsa, sistem gün sayısına göre tutarı <b>orantısal</b> böler.
                   </div>
                 </div>
@@ -563,7 +483,7 @@
               <div class="row tight">
                 <div>
                   <div class="muted small">Tarih</div>
-                  <input id="fuelDate" type="date" class="input" />
+                  <input id="fuelDate" type="date" class="input" min="2000-01-01" max="2100-12-31" />
                 </div>
                 <div>
                   <div class="muted small">Litre</div>
@@ -815,60 +735,84 @@
     return d;
   }
 
-  function isLastDayOfFeb(d) {
-    const y = d.getFullYear();
-    return d.getMonth() === 1 && d.getDate() === new Date(y, 2, 0).getDate();
+  
+  // Gün hesabı (standart):
+  // - İade tarihi hariç (exclusive): 15 → 28 = 13 gün
+  // - Ayın 31'i ücretlendirilmez (31 = 30 sayılır / yok sayılır)
+  //   Böylece 31 çeken aylar 30 gün olur.
+  function daysDiffExclusiveDates(s, e) {
+    const oneDay = 24 * 60 * 60 * 1000;
+    const diff = Math.round((e.getTime() - s.getTime()) / oneDay);
+    return diff > 0 ? diff : 0;
   }
 
-  // 30 gün standardı (30/360) - END DATE hariç (exclusive)
-  // Örnek: 2026-01-01 → 2026-02-01 = 30 gün
-  // Örnek: 2026-01-01 → 2026-01-02 = 1 gün
-  function day30(d) {
-    const dd = d.getDate();
-    if (dd === 31) return 30;
-    if (isLastDayOfFeb(d)) return 30;
-    return dd;
+  function monthHas31(y, m) {
+    return new Date(y, m + 1, 0).getDate() === 31;
   }
 
-  function serial30FromDate(d) {
-    const y = d.getFullYear();
-    const m = d.getMonth(); // 0-11
-    const d30 = day30(d);
-    return (y * 360) + (m * 30) + (d30 - 1); // day index 0..29
+  function count31stsInRangeDates(s, e) {
+    // Count 31st days in [s, e)
+    if (!s || !e) return 0;
+    if (e.getTime() <= s.getTime()) return 0;
+
+    let count = 0;
+    let y = s.getFullYear();
+    let m = s.getMonth();
+    const endY = e.getFullYear();
+    const endM = e.getMonth();
+
+    while (y < endY || (y === endY && m <= endM)) {
+      if (monthHas31(y, m)) {
+        const d31 = new Date(y, m, 31, 0, 0, 0, 0);
+        if (d31.getTime() >= s.getTime() && d31.getTime() < e.getTime()) count++;
+      }
+      m++;
+      if (m >= 12) { m = 0; y++; }
+    }
+    return count;
+  }
+
+  function daysCountDates(s, e) {
+    const diff = daysDiffExclusiveDates(s, e);
+    if (!diff) return 0;
+    const sub = count31stsInRangeDates(s, e);
+    const d = diff - sub;
+    return d > 0 ? d : 0;
   }
 
   function daysCount(startISO, endISO) {
     const s = parseDateLocal(startISO);
     const e = parseDateLocal(endISO);
     if (!s || !e) return 0;
-    const ss = serial30FromDate(s);
-    const ee = serial30FromDate(e);
-    const d = ee - ss;
-    return (d > 0) ? d : 0;
+    return daysCountDates(s, e);
   }
 
-
   function splitRangeByMonth(startISO, endISO) {
-    // 30 gün standardına göre ay kırılımı (end date hariç)
+    // Standart gün hesabına göre ay kırılımı (end date hariç)
     // returns [{year, monthIndex, days}]
     const s = parseDateLocal(startISO);
     const e = parseDateLocal(endISO);
     if (!s || !e) return [];
-    const ss = serial30FromDate(s);
-    const ee = serial30FromDate(e);
-    if (ee <= ss) return [];
+    if (e.getTime() <= s.getTime()) return [];
 
     const res = [];
-    const startYM = s.getFullYear() * 12 + s.getMonth();
-    const endYM = e.getFullYear() * 12 + e.getMonth();
+    let y = s.getFullYear();
+    let m = s.getMonth();
+    const endY = e.getFullYear();
+    const endM = e.getMonth();
 
-    for (let ym = startYM; ym <= endYM; ym++) {
-      const y = Math.floor(ym / 12);
-      const m = ym % 12;
-      const mStart = (y * 360) + (m * 30);
-      const mEnd = mStart + 30;
-      const overlap = Math.max(0, Math.min(ee, mEnd) - Math.max(ss, mStart));
-      if (overlap > 0) res.push({year: y, monthIndex: m, days: overlap});
+    while (y < endY || (y === endY && m <= endM)) {
+      const monthStart = new Date(y, m, 1, 0, 0, 0, 0);
+      const nextMonthStart = new Date(y, m + 1, 1, 0, 0, 0, 0);
+
+      const segStart = (s.getTime() > monthStart.getTime()) ? s : monthStart;
+      const segEnd = (e.getTime() < nextMonthStart.getTime()) ? e : nextMonthStart;
+
+      const d = daysCountDates(segStart, segEnd);
+      if (d > 0) res.push({ year: y, monthIndex: m, days: d });
+
+      m++;
+      if (m >= 12) { m = 0; y++; }
     }
     return res;
   }
@@ -1225,6 +1169,12 @@
   function validateRentalBase(r) {
     if (!r.customer) return "Müşteri adı boş olamaz.";
     if (!r.startDate || !r.endDate) return "Kiralama ve iade tarihleri zorunlu.";
+    const st = parseDateLocal(r.startDate);
+    const en = parseDateLocal(r.endDate);
+    if (!st || !en) return "Tarihler geçersiz.";
+    if (st.getFullYear() < 2000 || st.getFullYear() > 2100 || en.getFullYear() < 2000 || en.getFullYear() > 2100) {
+      return "Tarih yılı 2000-2100 aralığında olmalı.";
+    }
     const d = daysCount(r.startDate, r.endDate);
     if (d <= 0) return "Tarih aralığı hatalı (iade, kiralamadan önce olamaz).";
     if (!r.amount || r.amount <= 0) return "Tutar 0 olamaz.";
@@ -1244,6 +1194,9 @@
     const st = parseDateLocal(r.startDate);
     const en = parseDateLocal(r.endDate);
     if (!sd || !st || !en) return "Tarihler geçersiz.";
+    if (sd.getFullYear() < 2000 || sd.getFullYear() > 2100 || st.getFullYear() < 2000 || st.getFullYear() > 2100 || en.getFullYear() < 2000 || en.getFullYear() > 2100) {
+      return "Tarih yılı 2000-2100 aralığında olmalı.";
+    }
     if (!(sd > st && sd <= en)) return "Değişim tarihi kiralama tarihinden sonra ve iade tarihine eşit/önce olmalı.";
     // new leg validation: if currency2 chosen or amount2 provided, ensure rates ok
     const cur2 = s.currency2 || r.currency;
@@ -2254,21 +2207,5 @@ function renderRentalsTable() {
   }
 })();
 </script>
-<footer class="footer-brand">
-  <div class="footer-inner">
-    <div class="footer-text">2026 © </div>
-
-    <div class="footer-logo-wrap">
-      <img
-        class="footer-logo"
-        src="https://i.ibb.co/DH2mWWWD/footer-logo.png"
-        alt="Designed By Logo"
-        loading="lazy"
-        onerror="this.style.display='none';"
-      />
-    </div>
-  </div>
-</footer>
-
 </body>
 </html>

@@ -1,4 +1,4 @@
-const CACHE = "rentacar-offline-v4-2-2";
+const CACHE = "rentacar-offline-v4-3-0";
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
